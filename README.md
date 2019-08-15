@@ -125,11 +125,12 @@ This mode can save a considerable amount of memory and performance. Props `item`
         },
         methods: {
             getItemprops (itemIndex) {
-                const itemProps = getItemProp(itemIndex)
+                // <item/> will render with following data object:
+                // https://vuejs.org/v2/guide/render-function.html#The-Data-Object-In-Depth
                 return {
-                    // <item/> will render with itemProps.
-                    // https://vuejs.org/v2/guide/render-function.html#createElement-Arguments
-                    props: itemProps
+                    props: itemProps,
+                    attrs: itemAttrs,
+                    ...
                 }
             }
         },
@@ -191,25 +192,63 @@ According to the demos above, here are lists of approximate statistics:
 
 <img height="256" src="https://tangbc.github.io/github-images/vitual-scroll-list-prop-type.png">
 
-| Prop      | Type                | Required | Description                                                                                                                                                                                                                                                                               |
-|-----------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| size      | Number              | ✓        | Each list item height, in variable height, this prop just use to calculate the virtual-list outside container viewport fixed height.                                                                                                                                                      |
-| remain    | Number              | ✓        | How many items should be shown in virtual-list viewport, so `size` and `remain` determine the outside container viewport height (`size × remian`).                                                                                                                                        |
-| bench     | Number              | *        | Default value is equal to `remain`, unreached items count, not show in virtual-list viewport but exist in real DOM, the larger the bench, the higher the scroll performance will achieved.                                                                                                |
-| start     | Number              | *        | Default value is `0`, the initial scroll start index. It must be integer and in the range of list index, if invalid there will be effected as `0` or the last one.                                                                                                                        |
-| offset    | Number              | *        | Default value is `0`, the initial scroll offset. If both `start` and `offset` are assigned at initialization, `start` is preferred.                                                                                                                                                       |
-| debounce  | Number              | *        | It's disabled by default, milliseconds of using `debounce` function to ensure scroll event doesn't fire so often that it bricks browser performance.                                                                                                                                      |
-| rtag      | String              | *        | Default value is `div`, the virtual-list root element tag name, in all cases it's style is set to `display: block;`                                                                                                                                                                       |
-| wtag      | String              | *        | Default value is `div`, the virtual-list item wrapper element tag name, in all cases it's style is set to `display: block;`                                                                                                                                                               |
-| wclass    | String              | *        | Default is no classname, the virtual-list item wrapper element class, if assign this prop, you better **not** to change it's [CSS box model](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model).                                           |
-| pagemode  | Boolean             | *        | Let virtual-list scroll with page viewport.                                                                                                                                                                                                                                               |
-| totop     | Function            | *        | Called when virtual-list is scrolled to top, no param.                                                                                                                                                                                                                                    |
-| tobottom  | Function            | *        | Called when virtual-list is scrolled to bottom, no param.                                                                                                                                                                                                                                 |
-| onscroll  | Function            | *        | Called when virtual-list is scrolling, with param: [`(event, data)`](https://github.com/tangbc/vue-virtual-scroll-list/releases/tag/v1.1.7).                                                                                                                                              |
-| variable  | Function or Boolean | *        | Used in variable height, if assign `Function`, this prop is a variable height getter function which is called with param: `(index)` when each item is ready to be calculated; if assign `Boolean`, virtual-list will get each item variable height by it's inline style height automatic. |
-| item      | Component           | *        | Using in `item-mode`, list item vue component.                                                                                                                                                                                                                                            |
-| itemcount | Number              | *        | Using in `item-mode`, list data total counts.                                                                                                                                                                                                                                             |
-| itemprops | Function            | *        | Using in `item-mode`, a function call when each item is going to be rendered.                                                                                                                                                                                                             |
+> Props of basic:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| size          | Number              | ✓        | Each list item height, in variable height, this prop just use to calculate the virtual-list outside container viewport fixed height.                                                                                                                                                      |
+| remain        | Number              | ✓        | How many items should be shown in virtual-list viewport, so `size` and `remain` determine the outside container viewport height (`size × remian`).                                                                                                                                        |
+
+> Props of performance:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| bench         | Number              | *        | Default value is equal to `remain`, unreached items count, not show in virtual-list viewport but exist in real DOM, the larger the bench, the higher the scroll performance will achieved.                                                                                                |
+| debounce      | Number              | *        | It's disabled by default, milliseconds of using `debounce` function to ensure scroll event doesn't fire so often that it bricks browser performance.                                                                                                                                      |
+
+> Props of position:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| start         | Number              | *        | Default value is `0`, the initial scroll start index. It must be integer and in the range of list index, if invalid there will be effected as `0` or the last one.                                                                                                                        |
+| offset        | Number              | *        | Default value is `0`, the initial scroll offset. If both `start` and `offset` are assigned at initialization, `start` is preferred.                                                                                                                                                       |
+
+> Props of element and class:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| rtag          | String              | *        | Default value is `div`, virtual-list root element tag name, in all cases it's style is set to `display: block;`                                                                                                                                                                           |
+| wtag          | String              | *        | Default value is `div`, virtual-list item wrapper element tag name, in all cases it's style is set to `display: block;`                                                                                                                                                                   |
+| wclass        | String              | *        | Default is no classname, virtual-list item wrapper element class, if assign this prop, you better **not** to change it's [CSS box model](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model).                                               |
+
+> Props of scroll mode:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| pagemode      | Boolean             | *        | Let virtual-list scroll with window page viewport.                                                                                                                                                                                                                                        |
+| scrollelement | HTMLElement         | *        | Let virtual-list scroll with a parent element. When `pagemode` is true, `scrollelement` is ignored.                                                                                                                                                                                       |
+
+> Props of scroll event:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| totop         | Function            | *        | Called when virtual-list is scrolled to top, no param.                                                                                                                                                                                                                                    |
+| tobottom      | Function            | *        | Called when virtual-list is scrolled to bottom, no param.                                                                                                                                                                                                                                 |
+| onscroll      | Function            | *        | Called when virtual-list is scrolling, with param: [`(event, data)`](https://github.com/tangbc/vue-virtual-scroll-list/releases/tag/v1.1.7).                                                                                                                                              |
+
+> Props of variable height:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| variable      | Function or Boolean | *        | If assign `Function`, this prop is a variable height getter function which is called with param: `(index)` when each item is ready to be calculated; if assign `Boolean`, virtual-list will get each item variable height by it's inline style height automatic.                          |
+
+> Props of item-mode:
+
+| Prop          | Type                | Required | Description                                                                                                                                                                                                                                                                               |
+|---------------|---------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| item          | Component           | *        | List item vue component or vNode.                                                                                                                                                                                                                                                         |
+| itemcount     | Number              | *        | List total count, you should update this prop when source data changed.                                                                                                                                                                                                                   |
+| itemprops     | Function            | *        | A function call when each item is going to be rendered, you can assign props or data to each item component in this function.                                                                                                                                                             |
 
 
 ## Public methods
@@ -223,7 +262,7 @@ Here are some usefull public methods you can call via [`ref`](https://vuejs.org/
 
 ## Contributions
 
-Welcome to improve vue-virtual-scroll-list with any issue, pull request or code review.
+Welcome to improve this vue component with any issue, pull request or code review!
 
 
 ## Changelogs
