@@ -1,7 +1,6 @@
+.idea
+.vscode
+dist/*.map
 dev
+issues
 node_modules
-npm-debug.log
-coverage
-demos/dev/
-demos/dev*/
-demos/**/*.map
